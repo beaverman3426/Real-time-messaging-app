@@ -30,7 +30,8 @@ html = """
             };
             function sendMessage(event) {
                 var input = document.getElementById("messageText")
-                ws.send(input.value)
+                ws.send(JSON.stringify({ text: input.value }))
+
                 input.value = ''
                 event.preventDefault()
             }
@@ -62,7 +63,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             raw_data = await websocket.receive_text()
             try:
-                msg=message.model_validate(raw_data)
+                msg=message.model_validate_json(raw_data)
             except ValidationError as e:
                 await websocket.send_text(f"Validation error: {e}")
                 continue
@@ -79,10 +80,10 @@ async def websocket_endpoint(websocket: WebSocket):
             times.append(now)
             user_message_times[client_id] = times
 
-            data = await websocket.receive_text()
+            
             #Sends message to all Clients
             for client in connected_clients: 
-                await client.send_text(f"Message: {data}")
+                await client.send_text(f"Message: {msg.text}")
     except WebSocketDisconnect:
         pass
     #Cleaning up disconnected clients for memory
