@@ -1,51 +1,14 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
 import time
 from collections import defaultdict
 from pydantic import BaseModel, Field, ValidationError
+
+
 app = FastAPI()
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(JSON.stringify({ text: input.value }))
 
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
 class message(BaseModel):
     text: str = Field(min_length=1, max_length=500)
-
-
-@app.get("/")
-async def get():
-    return HTMLResponse(html)
 
 
 connected_clients = []
@@ -61,6 +24,7 @@ async def websocket_endpoint(websocket: WebSocket):
     client_id = websocket.client.host
     try:
         while True:
+            #message validation
             raw_data = await websocket.receive_text()
             try:
                 msg=message.model_validate_json(raw_data)
@@ -83,7 +47,7 @@ async def websocket_endpoint(websocket: WebSocket):
             
             #Sends message to all Clients
             for client in connected_clients: 
-                await client.send_text(f"Message: {msg.text}")
+                await client.send_text(f"{msg.text}")
     except WebSocketDisconnect:
         pass
     #Cleaning up disconnected clients for memory
