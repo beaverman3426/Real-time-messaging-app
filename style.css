@@ -47,7 +47,7 @@ form input[type="text"]:focus {
 }
 
 form button {
-    display: none; /* Hide the button completely */
+    display: none; 
 }
 
 ul#messages {
