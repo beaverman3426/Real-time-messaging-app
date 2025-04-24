@@ -15,7 +15,7 @@ ws.onmessage = function(event) {
     const formatted = timestamp.toLocaleString('en-GB', {
         day: 'numeric', month: 'long', year: 'numeric',
         hour: '2-digit', minute: '2-digit',
-        hour12: false
+        hour12: true
     });
 
     const timeEl = document.createElement('time');
@@ -31,9 +31,8 @@ ws.onmessage = function(event) {
 
 function sendMessage(event) {
     var input = document.getElementById("messageText");
-    if (input.value.trim().length > 0) {
-        ws.send(JSON.stringify({ text: input.value }));
-    }
+    
+    ws.send(JSON.stringify({ text: input.value }));
     input.value = '';
     event.preventDefault();
 }
