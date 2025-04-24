@@ -1,0 +1,76 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #313338;
+    color: #f2f3f5;
+    font-family: "gg sans", "Segoe UI", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#app {
+    width: 100%;
+    max-width: 700px;
+    background-color: #2b2d31;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #fff;
+    font-size: 1.5rem;
+}
+
+form {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+form input[type="text"] {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background-color: #383a40;
+    border: none;
+    border-radius: 6px;
+    color: #f2f3f5;
+    font-size: 1rem;
+}
+
+form input[type="text"]:focus {
+    outline: none;
+    background-color: #40444b;
+}
+
+form button {
+    display: none; /* Hide the button completely */
+}
+
+ul#messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+ul#messages li {
+    margin-bottom: 1rem;
+}
+
+ul#messages li span {
+    display: block;
+    font-weight: 500;
+    color: #dbdee1;
+    margin-bottom: 0.2rem;
+}
+
+ul#messages li time {
+    display: block;
+    font-size: 0.75rem;
+    color: #949ba4;
+}

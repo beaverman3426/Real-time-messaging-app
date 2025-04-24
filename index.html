@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8">
         <title>Chat</title>
+        <link rel="stylesheet" href="style.css">
         <script src="messaging.js"></script>
     </head>
     <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
+        <div id="app">
+         <h1>voidcord Chat</h1>
+         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
             <button>Send</button>
-        </form>
+         </form>
         <ul id='messages'>
         </ul>
-       
+       </div>
     </body>
 </html>
