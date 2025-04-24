@@ -2,13 +2,16 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import time
 from collections import defaultdict
 from pydantic import BaseModel, Field, ValidationError
-
+from datetime import datetime
+import pytz
+import json
 
 app = FastAPI()
 
 
 class message(BaseModel):
     text: str = Field(min_length=1, max_length=500)
+    timestamp:  datetime = Field(default_factory=lambda: datetime.now(tz=pytz.utc))
 
 
 connected_clients = []
@@ -47,7 +50,10 @@ async def websocket_endpoint(websocket: WebSocket):
             
             #Sends message to all Clients
             for client in connected_clients: 
-                await client.send_text(f"{msg.text}")
+                await client.send_text(json.dumps({
+                    "text": msg.text,
+                    "timestamp": msg.timestamp.isoformat()
+                }))
     except WebSocketDisconnect:
         pass
     #Cleaning up disconnected clients for memory
