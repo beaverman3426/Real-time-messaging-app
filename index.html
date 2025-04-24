@@ -7,6 +7,10 @@
         <script src="messaging.js"></script>
     </head>
     <body>
+        <script>
+             let username = prompt("Enter your username:");
+             if (!username) username = "anon";
+        </script>
         <div id="app">
          <h1>voidcord Chat</h1>
          <form action="" onsubmit="sendMessage(event)">

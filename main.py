@@ -12,6 +12,7 @@ app = FastAPI()
 class message(BaseModel):
     text: str = Field(min_length=1, max_length=500)
     timestamp:  datetime = Field(default_factory=lambda: datetime.now(tz=pytz.utc))
+    user: str = Field(min_length=1, max_length=30)
 
 
 connected_clients = []
@@ -52,7 +53,8 @@ async def websocket_endpoint(websocket: WebSocket):
             for client in connected_clients: 
                 await client.send_text(json.dumps({
                     "text": msg.text,
-                    "timestamp": msg.timestamp.isoformat()
+                    "timestamp": msg.timestamp.isoformat(),
+                    "user": msg.user
                 }))
     except WebSocketDisconnect:
         pass

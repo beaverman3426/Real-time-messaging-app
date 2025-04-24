@@ -6,9 +6,7 @@ ws.onmessage = function(event) {
     const messages = document.getElementById('messages');
     const messageItem = document.createElement('li');
 
-    // Message text
-    const textNode = document.createElement('span');
-    textNode.textContent = data.text + " ";
+    
 
     // Timestamp
     const timestamp = new Date(data.timestamp);
@@ -23,6 +21,9 @@ ws.onmessage = function(event) {
     timeEl.setAttribute('aria-label', formatted);
     timeEl.textContent = formatted.replace(',', '');
 
+    const textNode = document.createElement('span');
+    textNode.innerHTML = `<strong>${data.user || "anon"}</strong>: ${data.text}`;
+
     
     messageItem.appendChild(textNode);
     messageItem.appendChild(timeEl);
@@ -32,7 +33,7 @@ ws.onmessage = function(event) {
 function sendMessage(event) {
     var input = document.getElementById("messageText");
     
-    ws.send(JSON.stringify({ text: input.value }));
+    ws.send(JSON.stringify({ text: input.value, user:username }));
     input.value = '';
     event.preventDefault();
 }
