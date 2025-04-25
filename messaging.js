@@ -20,6 +20,8 @@ ws.onmessage = function(event) {
     timeEl.setAttribute('datetime', timestamp.toISOString());
     timeEl.setAttribute('aria-label', formatted);
     timeEl.textContent = formatted.replace(',', '');
+    
+
 
     const textNode = document.createElement('span');
     textNode.innerHTML = `<strong>${data.user || "anon"}</strong>: ${data.text}`;
