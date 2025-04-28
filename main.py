@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, ValidationError
 from datetime import datetime
 import pytz
 import json
+from db import get_db_session
 
 app = FastAPI()
 
