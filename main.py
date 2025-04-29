@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, ValidationError
 from datetime import datetime
 import pytz
 import json
+import asyncio
 from db import get_db_session
 
 app = FastAPI()
@@ -16,7 +17,7 @@ class message(BaseModel):
     user: str = Field(min_length=1, max_length=30)
 
 
-connected_clients = []
+connected_clients = set()
 user_message_times = defaultdict(list)
 
 MAX_CALLS = 5
@@ -56,7 +57,7 @@ def get_recent_messages(limit=20):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    connected_clients.append(websocket)
+    connected_clients.add(websocket)
     client_id = websocket.client.host
     #sending last 20 messages
 
@@ -95,12 +96,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
             
             #Sends message to all Clients
-            for client in connected_clients: 
-                await client.send_text(json.dumps({
-                    "text": msg.text,
-                    "timestamp": msg.timestamp.isoformat(),
-                    "user": msg.user
-                }))
+            send_tasks = [
+            client.send_text(json.dumps({
+                "text": msg.text,
+                "timestamp": msg.timestamp.isoformat(),
+                "user": msg.user
+            }))
+            for client in connected_clients
+        ]
+            await asyncio.gather(*send_tasks, return_exceptions=True)
     except WebSocketDisconnect:
         pass
     #Cleaning up disconnected clients for memory
