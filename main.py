@@ -22,11 +22,53 @@ user_message_times = defaultdict(list)
 MAX_CALLS = 5
 TIME_FRAME = 1  
 
+
+CONVO_ID = "global_chat"
+session = get_db_session()
+
+def save_message_to_db(msg: message):
+    bucket_month = msg.timestamp.strftime("%Y-%m")
+    session.execute(
+        """
+        INSERT INTO messages_by_conversation (convo_id, bucket_month, timestamp, user, text)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (CONVO_ID, bucket_month, msg.timestamp, msg.user, msg.text)
+    )
+
+def get_recent_messages(limit=20):
+    now = datetime.now(tz=pytz.utc)
+    bucket_month = now.strftime("%Y-%m")
+    rows = session.execute(
+        """
+        SELECT text, timestamp, user FROM messages_by_conversation
+        WHERE convo_id = %s AND bucket_month = %s
+        ORDER BY timestamp DESC
+        LIMIT %s
+        """,
+        (CONVO_ID, bucket_month, limit)
+    )
+    
+    return list(reversed(list(rows)))
+
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     connected_clients.append(websocket)
     client_id = websocket.client.host
+    #sending last 20 messages
+
+    recent_messages = get_recent_messages(limit=20)
+    for row in recent_messages:
+        await websocket.send_text(json.dumps({
+            "text": row.text,
+            "timestamp": row.timestamp.isoformat(),
+            "user": row.user
+        }))
+
+
     try:
         while True:
             #message validation
@@ -48,6 +90,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 continue
             times.append(now)
             user_message_times[client_id] = times
+            save_message_to_db(msg)
+
 
             
             #Sends message to all Clients
