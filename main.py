@@ -11,7 +11,7 @@ from db import get_db_session
 app = FastAPI()
 
 
-class message(BaseModel):
+class Message(BaseModel):
     text: str = Field(min_length=1, max_length=500)
     timestamp:  datetime = Field(default_factory=lambda: datetime.now(tz=pytz.utc))
     user: str = Field(min_length=1, max_length=30)
@@ -27,7 +27,7 @@ TIME_FRAME = 1
 CONVO_ID = "global_chat"
 session = get_db_session()
 
-def save_message_to_db(msg: message):
+def save_message_to_db(msg: Message):
     bucket_month = msg.timestamp.strftime("%Y-%m")
     session.execute(
         """
@@ -75,7 +75,7 @@ async def websocket_endpoint(websocket: WebSocket):
             #message validation
             raw_data = await websocket.receive_text()
             try:
-                msg=message.model_validate_json(raw_data)
+                msg=Message.parse_raw(raw_data)
             except ValidationError as e:
                 await websocket.send_text(f"Validation error: {e}")
                 continue
